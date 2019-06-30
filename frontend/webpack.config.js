@@ -1,6 +1,6 @@
 const webpack = require('webpack');
 
-const TransferWebpackPlugin = require('transfer-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
@@ -16,8 +16,9 @@ module.exports = {
   },
   devtool: 'eval',
   output: {
-    filename: 'index.jsx',
+    filename: 'index.js',
     publicPath: '/',
+    path: __dirname + '/build'
   },
   module: {
     rules: [
@@ -32,15 +33,15 @@ module.exports = {
     ],
   },
   plugins: [
-    new HtmlWebpackPlugin({ template: 'src/public/index.html' }),
+    new CopyWebpackPlugin([
+      { from: 'src/public' },
+    ]),
+    new HtmlWebpackPlugin({ template: 'src/public/index.html', inject: 'body' }),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
-    new TransferWebpackPlugin([
-      { from: 'src/public' },
-    ], '.'),
     new webpack.DefinePlugin({
       'process.env': {
-        ENDPOINT: JSON.stringify(process.env.ENDPOINT || 'http://0.0.0.0:9000/api'),
+        ENDPOINT: JSON.stringify(process.env.ENDPOINT || '/api'),
       },
     }),
   ],

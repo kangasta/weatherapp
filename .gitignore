@@ -3,6 +3,7 @@
 
 # Node
 node_modules
+build
 
 # Logs
 *.log
