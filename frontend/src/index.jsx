@@ -3,14 +3,23 @@ import ReactDOM from 'react-dom';
 
 const baseURL = process.env.ENDPOINT;
 
-const getWeatherFromApi = async () => {
+const getWeatherFromApi = async (lat, lon) => {
   try {
-    const response = await fetch(`${baseURL}/weather`);
+    const query = lat && lon ? `?lat=${lat}=&lon=${lon}` : '';
+    const response = await fetch(`${baseURL}/weather${query}`);
     return response.json();
   } catch (error) {
     throw new Error('Fetching weather data failed');
   }
 };
+
+const getUserLocation = options => new Promise((resolve, reject) => {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(resolve, reject, options);
+  } else {
+    reject('Geolocation is not supported or allowed by this browser.');
+  }
+});
 
 class Weather extends React.Component {
   constructor(props) {
@@ -18,7 +27,7 @@ class Weather extends React.Component {
 
     this.state = {
       data: '',
-      message: 'Waiting weather data',
+      message: 'Waiting for location data',
     };
   }
 
@@ -27,7 +36,10 @@ class Weather extends React.Component {
     let message;
 
     try {
-      data = await getWeatherFromApi();
+      const location = await getUserLocation();
+      const { latitude: lat, longitude: lon } = location.coords;
+
+      data = await getWeatherFromApi(lat, lon);
     } catch (error) {
       message = error;
     }
