@@ -8,10 +8,8 @@ const getWeatherFromApi = async () => {
     const response = await fetch(`${baseURL}/weather`);
     return response.json();
   } catch (error) {
-    console.error(error);
+    throw new Error('Fetching weather data failed');
   }
-
-  return {};
 };
 
 class Weather extends React.Component {
@@ -19,21 +17,32 @@ class Weather extends React.Component {
     super(props);
 
     this.state = {
-      icon: "",
+      data: '',
+      message: 'Waiting weather data',
     };
   }
 
   async componentWillMount() {
-    const weather = await getWeatherFromApi();
-    this.setState({icon: weather.icon.slice(0, -1)});
+    let data;
+    let message;
+
+    try {
+      data = await getWeatherFromApi();
+    } catch (error) {
+      message = error;
+    }
+
+    this.setState({ data, message });
   }
 
   render() {
-    const { icon } = this.state;
+    const { data, message } = this.state;
+    const icon = data && data.icon.slice(0, -1);
 
     return (
       <div className="icon">
-        { icon && <img src={`/img/${icon}.svg`} /> }
+        { icon && <img alt={data.main} src={`/img/${icon}.svg`} /> }
+        { message }
       </div>
     );
   }

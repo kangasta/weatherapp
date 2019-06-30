@@ -9,6 +9,9 @@ body{
 }
 
 .icon {
+  font-size: 3em;
   width: 30vw;
   height: 30vw;
+  line-height: 30vw;
+  text-align: center;
 }

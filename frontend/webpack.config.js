@@ -18,7 +18,7 @@ module.exports = {
   output: {
     filename: 'index.js',
     publicPath: '/',
-    path: __dirname + '/build'
+    path: `${__dirname}/build`,
   },
   module: {
     rules: [
