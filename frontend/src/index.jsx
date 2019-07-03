@@ -26,7 +26,7 @@ class Weather extends React.Component {
     super(props);
 
     this.state = {
-      data: '',
+      data: null,
       message: 'Waiting for location data',
     };
   }
@@ -48,8 +48,15 @@ class Weather extends React.Component {
   }
 
   render() {
-    const { data, message } = this.state;
-    const icon = data && data.icon.slice(0, -1);
+    const { data } = this.state;
+    let { message } = this.state;
+    let icon = null;
+
+    try {
+      icon = data && data.icon.slice(0, -1);
+    } catch (e) {
+      message = 'Received invalid data';
+    }
 
     return (
       <div className="icon">
