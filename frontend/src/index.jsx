@@ -31,7 +31,7 @@ class Weather extends React.Component {
     };
   }
 
-  async componentWillMount() {
+  async componentDidMount() {
     let data;
     let message;
 
