@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 
 const baseURL = process.env.ENDPOINT;
@@ -21,50 +21,39 @@ const getUserLocation = options => new Promise((resolve, reject) => {
   }
 });
 
-class Weather extends React.Component {
-  constructor(props) {
-    super(props);
+function Weather() {
+  const [data, setData] = useState(null);
+  const [message, setMessage] = useState('Waiting for location data');
 
-    this.state = {
-      data: null,
-      message: 'Waiting for location data',
-    };
-  }
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const location = await getUserLocation();
+        const { latitude: lat, longitude: lon } = location.coords;
 
-  async componentDidMount() {
-    let data;
-    let message;
-
-    try {
-      const location = await getUserLocation();
-      const { latitude: lat, longitude: lon } = location.coords;
-
-      data = await getWeatherFromApi(lat, lon);
-    } catch (error) {
-      message = error;
+        setData(await getWeatherFromApi(lat, lon));
+        setMessage(null);
+      } catch (error) {
+        setMessage(error.toString());
+      }
     }
+    fetchData();
+  }, []);
 
-    this.setState({ data, message });
+  let icon = null;
+
+  try {
+    icon = data && data.icon.slice(0, -1);
+  } catch (e) {
+    setMessage('Received invalid data');
   }
 
-  render() {
-    const { data } = this.state;
-    let { message } = this.state;
-    let icon = null;
-
-    try {
-      icon = data && data.icon.slice(0, -1);
-    } catch (e) {
-      message = 'Received invalid data';
-    }
-
-    return (
-      <div className="icon">
-        { icon && <img alt={data.main} src={`/img/${icon}.svg`} /> }
-        { message }
-      </div>
-    );
-  }
+  return (
+    <div className="icon">
+      { icon && <img alt={data.main} src={`/img/${icon}.svg`} /> }
+      { message }
+    </div>
+  );
 }
 
 ReactDOM.render(
